@@ -197,8 +197,19 @@ public class DataHolder {
 			cont++;
 		}
 		System.out.println("El set de datos tiene "+cont+" atributos.");
-
-		
+	}
+	
+	/*
+	 * brief Imprime una instancia del set de datos
+	 * 
+	 * param pData Las instancias de las que se imprimirá una de ellas
+	 * i La instancia concreta que se imprimirá
+	 * 
+	 * return void 
+	 */
+	public static void printInstancia(Instances pData, int i){
+		System.out.println(pData.instance(i));
+		System.out.println("El set de datos tiene "+pData.numInstances()+" atributos.");
 	}
 
 	/*
@@ -215,7 +226,7 @@ public class DataHolder {
 		boolean fin = false;
 		for(int i = 0; i < datos.numAttributes() && !fin; i++){
 			atributo = datos.instance(0).attribute(i).name();
-			if(atributo.equals("classs")){
+			if(atributo.equals("class")){
 				attIndex = i;
 				fin = true;
 			}

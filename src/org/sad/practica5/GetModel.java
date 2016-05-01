@@ -7,79 +7,16 @@ import java.util.Random;
 import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.BayesNet;
 import weka.classifiers.bayes.net.search.local.SimulatedAnnealing;
+import weka.classifiers.functions.LibSVM;
+import weka.core.Instances;
 import weka.core.SerializationHelper;
 
 public class GetModel {
 
-	static BayesNet bayesNet;
-	static SimulatedAnnealing sa;
-	static int trainSize;
-	static int testSize;
 	private static FileWriter writer;
+	private static LibSVM svm;
 
-	/*
-	 * brief Realiza evaluación mediante resustitución aplicando BayesNet 
-	 * 
-	 * note Se aplica con las configuraciones del clasificador tuneado
-	 *  
-	 * return void Imprime resultados "DetailedAccuracyByClass"
-	 */
-	public static void bayesNetTunedResubstitution() {
 	
-		try {
-			
-			System.out.println("** BAYES-NET - TUNED - RESUBSTITUTION**");
-
-			sa = new SimulatedAnnealing();
-			sa.setTStart(0);
-			sa.setDelta(0.001);
-			sa.setMarkovBlanketClassifier(true);
-
-			bayesNet = new BayesNet();
-			bayesNet.buildClassifier(DataHolder.getDatosTrainTest());
-
-			Evaluation eval = new Evaluation(DataHolder.getDatosTrainTest());
-			eval.evaluateModel(bayesNet, DataHolder.getDatosTrainTest());
-
-			printDetailedAccuracyByClass(eval,"** BAYES-NET - TUNED - RESUBSTITUTION**");
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	/*
-	 * brief Realiza evaluación mediante CrossFold aplicando BayesNet 
-	 * 
-	 * note Se aplica con las configuraciones del clasificador tuneado
-	 *  
-	 * return void Imprime resultados "DetailedAccuracyByClass"
-	 */
-	public static void bayesNetTunedCrossFold() {
-
-		try {
-
-			System.out.println("** BAYES-NET - TUNED - 10 CROSS FOLD**");
-
-			sa = new SimulatedAnnealing();
-			sa.setTStart(0);
-			sa.setDelta(0.001);
-			sa.setMarkovBlanketClassifier(true);
-
-			bayesNet = new BayesNet();
-			bayesNet.buildClassifier(DataHolder.getDatosTrainTest());
-
-			Evaluation eval = new Evaluation(DataHolder.getDatosTrainTest());
-			eval.crossValidateModel(bayesNet, DataHolder.getDatosTrainTest(), 10, new Random(0));
-
-			printDetailedAccuracyByClass(eval,"** BAYES-NET - TUNED - 10 CROSS FOLD**");
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-	}
 
 	/*
 	 * brief Realiza evaluación mediante HoldOut aplicando BayesNet 
@@ -88,27 +25,27 @@ public class GetModel {
 	 *  
 	 * return void Imprime resultados "DetailedAccuracyByClass"
 	 */
-	public static void bayesNetTunedHoldOut() {
-
+	public static void svmTunedHoldOut() {
+		
+		DataHolder.getDatosTrain().setClassIndex(DataHolder.getClassIndex(DataHolder.getDatosTrain()));//Asignar clase
+		Instances trainSet = DataHolder.getDatosTrain();
+		
+		DataHolder.getDatosTest().setClassIndex(DataHolder.getClassIndex(DataHolder.getDatosTest()));//Asignar clase
+		Instances testSet = DataHolder.getDatosTest();
 
 		try {
 
-			System.out.println("** BAYES-NET - TUNED - HOLD OUT**");
+			System.out.println("** SVM - TUNED - HOLD OUT**");
 
-			sa = new SimulatedAnnealing();
-			sa.setTStart(0);
-			sa.setDelta(0.001);
-			sa.setMarkovBlanketClassifier(true);
+			svm = new LibSVM();
+			svm.buildClassifier(trainSet);
 
-			bayesNet = new BayesNet();
-			bayesNet.buildClassifier(DataHolder.getDatosTrain());
-
-			Evaluation eval = new Evaluation(DataHolder.getDatosTest());
-			eval.evaluateModel(bayesNet, DataHolder.getDatosTest());
+			Evaluation eval = new Evaluation(testSet);
+			eval.evaluateModel(svm, testSet);
 			
 			saveBinaryModel();
 
-			printDetailedAccuracyByClass(eval,"** BAYES-NET - TUNED - HOLD OUT**");
+			printDetailedAccuracyByClass(eval,"** SVM - TUNED - HOLD OUT**");
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -125,24 +62,14 @@ public class GetModel {
 	 */
 	public static void saveBinaryModel(){
 		try {
-			SerializationHelper.write("modeloBinarioBayesNet", bayesNet);
+			SerializationHelper.write("modeloBinarioSVM", svm);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}//Modelo resultante en fichero binario
 	}
 	
-	/*
-	 * brief Divide las instancias {Train U Test} en dos partes según el porcentaje establecido
-	 *  
-	 * params pPercentage El porcentaje para train
-	 *  
-	 * return void Asigna los tamaños de Train y Test
-	 */
-	public static void percentageSplit(int pPercentage) {
-		trainSize = (int) Math.round(DataHolder.getDatosTrainTest().numInstances() * pPercentage / 100);
-		testSize = DataHolder.getDatosTrainTest().numInstances() - trainSize;
-	}
+	
 	
 
 	/*
@@ -223,16 +150,18 @@ public class GetModel {
 		//Cargar datos
 		DataHolder.loadTrainData(args[0]);
 		DataHolder.loadTestData(args[1]);
-		DataHolder.loadTrainTestData();
 		System.out.println("Datos cargados");
 
 		System.out.println("Preprocesando datos...");
 		//Preprocesado
+		Preprocess.standardize(DataHolder.getDatosTrain(), DataHolder.getDatosTest());
 		System.out.println("Datos preprocesados");
+		
+
 
 		//HoldOut
-		Evaluate.evaluarNaiveHoldOut();
-		bayesNetTunedHoldOut();
+//		Evaluate.evaluarNaiveHoldOut();
+		svmTunedHoldOut();
 
 	}
 
