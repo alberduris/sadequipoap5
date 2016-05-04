@@ -3,6 +3,10 @@ package org.sad.practica5;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.LibSVM;
@@ -275,7 +279,40 @@ public class ParameterTuning {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		
 		int cont = 0;
+		while ((double) weightedFMeasure >= aux && cont < 10) {
+			cont++;
+			try {
+				aux = weightedFMeasure;
+				writer = new FileWriter(file, true);
+				svm.buildClassifier(trainSet);
+				Evaluation eval = new Evaluation(testSet);
+				eval.evaluateModel(svm, testSet);
+				weightedFMeasure = eval.weightedFMeasure();
+				writer.write(gamma + "," + coef0 + "," + degree + "," + weightedFMeasure + "\n");
+				writer.close();
+
+				degree = degree + 1;
+				svm.setDegree(degree);
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		}
+
+		if(cont < 10){
+			degree = degree - 2;
+			svm.setDegree(degree);
+		}
+		else{
+			svm.setDegree(3);
+		}
+		
+		weightedFMeasure = -1.0;
+		aux = -1.0;
+		cont = 0;
 		while ((double) weightedFMeasure >= aux && cont < 10) {
 			cont++;
 			try {
@@ -295,13 +332,14 @@ public class ParameterTuning {
 				e.printStackTrace();
 			}
 		}
-		cont = 0;
+		
+		
 		gamma = gamma - 0.2;
 		svm.setGamma(gamma);
 
 		weightedFMeasure = -1.0;
 		aux = -1.0;
-
+		cont = 0;
 		while ((double) weightedFMeasure >= aux && cont < 10) {
 			cont++;
 			try {
@@ -326,30 +364,7 @@ public class ParameterTuning {
 		coef0 = coef0 - 0.2;
 		svm.setCoef0(coef0);
 
-		cont = 0;
-		while ((double) weightedFMeasure >= aux && cont < 10) {
-			cont++;
-			try {
-				aux = weightedFMeasure;
-				writer = new FileWriter(file, true);
-				svm.buildClassifier(trainSet);
-				Evaluation eval = new Evaluation(testSet);
-				eval.evaluateModel(svm, testSet);
-				weightedFMeasure = eval.weightedFMeasure();
-				writer.write(gamma + "," + coef0 + "," + degree + "," + weightedFMeasure + "\n");
-				writer.close();
-
-				degree = degree + 1;
-				svm.setDegree(degree);
-
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-		}
-
-		degree = degree - 2;
-		svm.setDegree(degree);
+		
 
 		try {
 			writer = new FileWriter(file, true);
@@ -465,6 +480,155 @@ public class ParameterTuning {
 
 	}
 
+	
+	/*
+	 * brief Realiza un barrido sobre los parámetros que afectan al tipo de
+	 * kernel: Polynomial
+	 * 
+	 * note Los parámetros son: gamma, coef0 y degree
+	 * 
+	 * return void Imprime resultados en fichero
+	 */
+	public static void polynomialKernel2() {
+
+		File file = null;
+		double gamma = 0.0;
+		double coef0 = 0.0;
+		int degree = 1;
+		double weightedFMeasure = -1.0;
+		
+		HashMap<Double,Double> listaGamma = new HashMap<>();
+		HashMap<Double,Double> listaCoef0 = new HashMap<>();
+		HashMap<Integer,Double> listaDegree = new HashMap<>();
+
+		
+
+		DataHolder.getDatosTrain().setClassIndex(DataHolder.getClassIndex(DataHolder.getDatosTrain()));
+		Instances trainSet = DataHolder.getDatosTrain();
+		DataHolder.getDatosTest().setClassIndex(DataHolder.getClassIndex(DataHolder.getDatosTest()));
+		Instances testSet = DataHolder.getDatosTest();
+
+		svm = new LibSVM();
+		svm.setKernelType(new SelectedTag(LibSVM.KERNELTYPE_POLYNOMIAL, LibSVM.TAGS_KERNELTYPE));
+		svm.setGamma(0.0);
+		svm.setCoef0(0.0);
+		svm.setDegree(0);
+
+		try {
+			file = new File("BarridoParametros\\svm_polynomialKernel.csv");
+			file.getParentFile().mkdir();
+			file.createNewFile();
+			writer = new FileWriter(file, true);
+			writer.write("gamma,coef0,degree,weightedFMeasure\n");
+			writer.close();
+
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		for(int i = 0; i < 20 ; i++){
+			try {
+				writer = new FileWriter(file, true);
+				svm.buildClassifier(trainSet);
+				Evaluation eval = new Evaluation(testSet);
+				eval.evaluateModel(svm, testSet);
+				weightedFMeasure = eval.weightedFMeasure();
+				listaDegree.put(degree, weightedFMeasure);
+				writer.write(gamma + "," + coef0 + "," + degree + "," + weightedFMeasure + "\n");
+				writer.close();
+
+				degree = degree + 1;
+				svm.setDegree(degree);
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		}
+		listaDegree = (HashMap<Integer, Double>) MapUtil.sortByValue(listaDegree);
+		Set<Integer> set = listaDegree.keySet();
+		Iterator<Integer> it = set.iterator();
+		degree = it.next().intValue();
+		svm.setDegree(degree);
+		
+
+		
+		weightedFMeasure = -1.0;
+		
+		for(int i = 0; i < 20 ; i++){
+			
+			try {
+				writer = new FileWriter(file, true);
+				svm.buildClassifier(trainSet);
+				Evaluation eval = new Evaluation(testSet);
+				eval.evaluateModel(svm, testSet);
+				weightedFMeasure = eval.weightedFMeasure();
+				listaGamma.put(gamma, weightedFMeasure);
+				writer.write(gamma + "," + coef0 + "," + degree + "," + weightedFMeasure + "\n");
+				writer.close();
+
+				gamma = gamma + 0.1;
+				svm.setGamma(gamma);
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		listaGamma = (HashMap<Double, Double>) MapUtil.sortByValue(listaGamma);
+		Set<Double> setDouble = listaGamma.keySet();
+		Iterator<Double> itDouble = setDouble.iterator();
+		gamma = itDouble.next().doubleValue();
+		svm.setGamma(gamma);
+
+
+		weightedFMeasure = -1.0;
+		for(int i = 0; i < 20 ; i++){
+			
+			try {
+				writer = new FileWriter(file, true);
+				svm.buildClassifier(trainSet);
+				Evaluation eval = new Evaluation(testSet);
+				eval.evaluateModel(svm, testSet);
+				weightedFMeasure = eval.weightedFMeasure();
+				listaCoef0.put(coef0, weightedFMeasure);
+				writer.write(gamma + "," + coef0 + "," + degree + "," + weightedFMeasure + "\n");
+				writer.close();
+
+				coef0 = coef0 + 0.1;
+				svm.setCoef0(coef0);
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		}
+
+		listaCoef0 = (HashMap<Double, Double>) MapUtil.sortByValue(listaCoef0);
+		setDouble = listaCoef0.keySet();
+		itDouble = setDouble.iterator();
+		coef0 = itDouble.next().doubleValue();
+		svm.setCoef0(coef0);
+
+		
+
+		try {
+			writer = new FileWriter(file, true);
+			writer.write("VALORES OPTIMOS:" + "\n");
+			writer.write("gamma,coef0,degree\n");
+			writer.write(svm.getGamma() + "," + svm.getCoef0() + "," + svm.getDegree() + "\n");
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+	
+	
+	
+	
+	
 	public static void main(String[] args) {
 		System.out.println("Cargando datos...");
 		// Cargar datos
@@ -475,7 +639,7 @@ public class ParameterTuning {
 		// cost();
 		// eps();
 		// gamma();
-		polynomialKernel();
+		polynomialKernel2();
 		//sigmoidKernel();
 		
 
