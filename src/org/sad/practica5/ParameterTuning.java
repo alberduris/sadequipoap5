@@ -11,6 +11,7 @@ import weka.classifiers.Evaluation;
 import weka.classifiers.functions.LibSVM;
 import weka.core.Instances;
 import weka.core.SelectedTag;
+import weka.core.SerializationHelper;
 
 public class ParameterTuning {
 
@@ -513,6 +514,31 @@ public class ParameterTuning {
 		}
 	}
 	
+	/*
+	 * brief Almacena el modelo binario del clasificador 
+	 * 
+	 * note Se genera con las configuraciones del clasificador tuneado
+	 *  
+	 * return void Se genera el archivo binario
+	 */
+	public static void saveBinaryModel(){
+		
+		svm = new LibSVM();
+		svm.setSVMType(new SelectedTag(LibSVM.SVMTYPE_C_SVC, LibSVM.TAGS_SVMTYPE));
+		svm.setCost(8.2);
+		svm.setEps(0.4);
+		svm.setGamma(0.0264);
+		svm.setKernelType(new SelectedTag(LibSVM.KERNELTYPE_RBF, LibSVM.TAGS_KERNELTYPE));
+		
+		try {
+			SerializationHelper.write("modeloBinarioSVM", svm);
+			System.out.println("Modelo binario SVM tuneado generado.");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}//Modelo resultante en fichero binario
+	}
+	
 	
 	public static void main(String[] args) {
 		System.out.println("Cargando datos...");
@@ -520,15 +546,10 @@ public class ParameterTuning {
 		DataHolder.loadTrainData(args[0]);
 		DataHolder.loadTestData(args[1]);
 		System.out.println("Datos cargados");
+		System.out.println("Generando modelo binario...");
+		saveBinaryModel();
 
-		//cost();
-		//eps();
-		//gamma();
-		//polynomialKernel();
-		//sigmoidKernel();
-		//cost_adv();
-		//gamma_adv();
-		eps_adv();
+	
 
 	}
 
