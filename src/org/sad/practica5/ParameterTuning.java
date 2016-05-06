@@ -182,7 +182,7 @@ public class ParameterTuning {
 		}
 
 	}
-	
+
 	/*
 	 * brief Realiza un barrido sobre el parámetro nu
 	 * 
@@ -202,7 +202,7 @@ public class ParameterTuning {
 		System.out.println("** TUNING GAMMA **");
 		System.out.println("Gamma,weightedFMeasure\n");
 		svm = new LibSVM();
-		//svm.setSVMType();
+		// svm.setSVMType();
 
 		try {
 			file = new File("BarridoParametros\\svm_gamma.csv");
@@ -239,13 +239,6 @@ public class ParameterTuning {
 
 	}
 
-	
-	
-	
-
-	
-	
-	
 	/*
 	 * brief Realiza un barrido sobre los parámetros que afectan al tipo de
 	 * kernel: Polynomial
@@ -256,16 +249,13 @@ public class ParameterTuning {
 	 */
 	public static void sigmoidKernel() {
 
-	
 		File file = null;
 		double gamma = 0.0;
 		double coef0 = 0.0;
 		double weightedFMeasure = -1.0;
-		
-		HashMap<Double,Double> listaGamma = new HashMap<>();
-		HashMap<Double,Double> listaCoef0 = new HashMap<>();
 
-		
+		HashMap<Double, Double> listaGamma = new HashMap<>();
+		HashMap<Double, Double> listaCoef0 = new HashMap<>();
 
 		DataHolder.getDatosTrain().setClassIndex(DataHolder.getClassIndex(DataHolder.getDatosTrain()));
 		Instances trainSet = DataHolder.getDatosTrain();
@@ -289,10 +279,9 @@ public class ParameterTuning {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
-				
-		for(int i = 0; i < 20 ; i++){
-			
+
+		for (int i = 0; i < 20; i++) {
+
 			try {
 				writer = new FileWriter(file, true);
 				svm.buildClassifier(trainSet);
@@ -310,17 +299,16 @@ public class ParameterTuning {
 				e.printStackTrace();
 			}
 		}
-		
+
 		listaGamma = (HashMap<Double, Double>) MapUtil.sortByValue(listaGamma);
 		Set<Double> setDouble = listaGamma.keySet();
 		Iterator<Double> itDouble = setDouble.iterator();
 		gamma = itDouble.next().doubleValue();
 		svm.setGamma(gamma);
 
-
 		weightedFMeasure = -1.0;
-		for(int i = 0; i < 20 ; i++){
-			
+		for (int i = 0; i < 20; i++) {
+
 			try {
 				writer = new FileWriter(file, true);
 				svm.buildClassifier(trainSet);
@@ -346,8 +334,6 @@ public class ParameterTuning {
 		coef0 = itDouble.next().doubleValue();
 		svm.setCoef0(coef0);
 
-		
-
 		try {
 			writer = new FileWriter(file, true);
 			writer.write("VALORES OPTIMOS:" + "\n");
@@ -359,8 +345,7 @@ public class ParameterTuning {
 		}
 
 	}
-	
-	
+
 	public static void cost_adv() {
 
 		File file = null;
@@ -410,7 +395,7 @@ public class ParameterTuning {
 		}
 
 	}
-	
+
 	public static void gamma_adv() {
 
 		File file = null;
@@ -460,7 +445,7 @@ public class ParameterTuning {
 			}
 		}
 	}
-	
+
 	public static void eps_adv() {
 
 		File file = null;
@@ -513,43 +498,117 @@ public class ParameterTuning {
 			}
 		}
 	}
-	
+
 	/*
-	 * brief Almacena el modelo binario del clasificador 
+	 * brief Almacena el modelo binario del clasificador
 	 * 
 	 * note Se genera con las configuraciones del clasificador tuneado
-	 *  
+	 * 
 	 * return void Se genera el archivo binario
 	 */
-	public static void saveBinaryModel(){
-		
+	public static void saveBinaryModel() {
+
 		svm = new LibSVM();
 		svm.setSVMType(new SelectedTag(LibSVM.SVMTYPE_C_SVC, LibSVM.TAGS_SVMTYPE));
 		svm.setCost(8.2);
 		svm.setEps(0.4);
 		svm.setGamma(0.0264);
 		svm.setKernelType(new SelectedTag(LibSVM.KERNELTYPE_RBF, LibSVM.TAGS_KERNELTYPE));
-		
+
 		try {
 			SerializationHelper.write("modeloBinarioSVM", svm);
 			System.out.println("Modelo binario SVM tuneado generado.");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}//Modelo resultante en fichero binario
+		} // Modelo resultante en fichero binario
 	}
-	
-	
+
+	//Inviable --> 48h de ejecución aproximadamente
+	public static void RBFGridSearch() {
+
+		File file = null;
+
+		double weightedFMeasure = -1;
+
+		double cost = 0;
+		double costBase = 2;
+		double costExp = -3; // Range [-3,15]
+		cost = Math.pow(costBase, costExp);
+
+		double gamma = 0;
+		double gammaBase = 2;
+		double gammaExp = -15; // Range [-15,3]
+		gamma = Math.pow(gammaBase, gammaExp);
+
+		DataHolder.getDatosTrain().setClassIndex(DataHolder.getClassIndex(DataHolder.getDatosTrain()));
+		Instances trainSet = DataHolder.getDatosTrain();
+		DataHolder.getDatosTest().setClassIndex(DataHolder.getClassIndex(DataHolder.getDatosTest()));
+		Instances testSet = DataHolder.getDatosTest();
+
+		svm = new LibSVM();
+		svm.setSVMType(new SelectedTag(LibSVM.SVMTYPE_C_SVC, LibSVM.TAGS_SVMTYPE));
+		svm.setCost(cost);
+		svm.setGamma(gamma);
+		svm.setKernelType(new SelectedTag(LibSVM.KERNELTYPE_RBF, LibSVM.TAGS_KERNELTYPE));
+
+		try {
+			file = new File("BarridoParametros\\RBF_GridSearch.csv");
+			file.getParentFile().mkdir();
+			file.createNewFile();
+			writer = new FileWriter(file, true);
+			writer.write("cost,gamma,weightedFMeasure\n");
+			writer.close();
+
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		for (int i = 0; i < 120; i++) { // Ciclo cost
+			for (int j = 0; j < 120; j++) { // Ciclo gamma
+
+				try {
+
+					writer = new FileWriter(file, true);
+					svm.buildClassifier(trainSet);
+					Evaluation eval = new Evaluation(testSet);
+					eval.evaluateModel(svm, testSet);
+					weightedFMeasure = eval.weightedFMeasure();
+					System.out.println(cost + "," + gamma + "," + weightedFMeasure + "\n");
+					writer.write(cost + "," + gamma + "," + weightedFMeasure + "\n");
+					writer.close();
+					
+					gammaExp = gammaExp + 0.1;
+					gamma = Math.pow(gammaBase, gammaExp);
+					svm.setGamma(gamma);
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+
+			costExp = costExp + 0.1;
+			cost = Math.pow(costBase, costExp);
+			svm.setCost(cost);
+			
+			gammaBase = 2;
+			gammaExp = -15; // Range [-15,3]
+			gamma = Math.pow(gammaBase, gammaExp);
+
+		}
+
+	}
+
 	public static void main(String[] args) {
 		System.out.println("Cargando datos...");
 		// Cargar datos
 		DataHolder.loadTrainData(args[0]);
 		DataHolder.loadTestData(args[1]);
-		System.out.println("Datos cargados");
-		System.out.println("Generando modelo binario...");
-		saveBinaryModel();
-
-	
+		// System.out.println("Datos cargados");
+		// System.out.println("Generando modelo binario...");
+		// saveBinaryModel();
+		RBFGridSearch();
 
 	}
 
