@@ -24,9 +24,11 @@ public class Evaluate {
 	 */
 	public static void evaluarNaiveHoldOut() {
 
-		Instances trainInstances = new Instances(DataHolder.getDatosTrainTest());
+		DataHolder.getDatosTrain().setClassIndex(DataHolder.getClassIndex(DataHolder.getDatosTrain()));//Asignar clase
+		DataHolder.getDatosTest().setClassIndex(DataHolder.getClassIndex(DataHolder.getDatosTest()));//Asignar clase
 
-		Instances testInstances = new Instances(DataHolder.getDatosTrainTest());
+		Instances trainInstances = new Instances(DataHolder.getDatosTrain());
+		Instances testInstances = new Instances(DataHolder.getDatosTest());
 
 		try {
 
@@ -38,49 +40,14 @@ public class Evaluate {
 			Evaluation eval = new Evaluation(testInstances);
 			eval.evaluateModel(naiveBayes, testInstances);
 
-			GetModel.printDetailedAccuracyByClass(eval,"** NAÏVE BAYES - HoldOut**");
+			InferedModelMain.printDetailedAccuracyByClass(eval,"** NAÏVE BAYES - HoldOut**");
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	/*
-	 * brief Realiza evaluación mediante HoldOut aplicando BayesNet 
-	 * 
-	 * note Se aplica con las configuraciones del clasificador standar
-	 *  
-	 * return void Imprime resultados figuras de mérito principales
-	 */
-	public static void evaluarBayesNetHoldOut() {
-
-		Instances trainInstances = new Instances(DataHolder.getDatosTrainTest());
-		Instances testInstances = new Instances(DataHolder.getDatosTrainTest());
-
-		try {
-
-			System.out.println("** BAYES-NET - HoldOut**");
-
-			svm = new LibSVM();
-			svm.buildClassifier(trainInstances);
-
-			Evaluation eval = new Evaluation(testInstances);
-			eval.evaluateModel(svm, testInstances);
-
-			SerializationHelper.write("modelPath", svm);//Modelo resultante en fichero binario
-
-			printResultSet(eval, DataHolder.getDatosTrainTest());
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	/*
-	 * brief Realiza barrido de parámetros principales de K2 para BayesNet
-	 *  
-	 * return void Genera un fichero con los resultados
-	 */
+	
 	
 	/*
 	 * brief Imprime resultados con varias figuras de merito

@@ -26,18 +26,18 @@ public class Preprocess {
 		Instances datosProcesadosTest = null;
 
 		Standardize standardize = new Standardize();
+		standardize.setIgnoreClass(true);
 
 		try {
 			standardize.setInputFormat(pDataTrain);
-			standardize.setInputFormat(pDataTest);
-
-
+		
+			
 			datosProcesadosTrain = Filter.useFilter(pDataTrain, standardize);
 			datosProcesadosTest = Filter.useFilter(pDataTest, standardize);
 
 			DataHolder.setDatosTrain(datosProcesadosTrain); 
 			DataHolder.setDatosTest(datosProcesadosTest);
-
+		
 		}
 
 		catch (Exception e) {

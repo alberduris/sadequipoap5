@@ -349,8 +349,10 @@ public class ParameterTuning {
 	public static void cost_adv() {
 
 		File file = null;
-		double cost = 7.1;
+		double cost = 3.01;
 		double weightedFMeasure = -1.0;
+
+		Preprocess.standardize(DataHolder.getDatosTrain(), DataHolder.getDatosTest());
 
 		DataHolder.getDatosTrain().setClassIndex(DataHolder.getClassIndex(DataHolder.getDatosTrain()));
 		Instances trainSet = DataHolder.getDatosTrain();
@@ -374,7 +376,7 @@ public class ParameterTuning {
 			e1.printStackTrace();
 		}
 
-		for (int i = 0; i < 19; i++) {
+		for (int i = 0; i < 9; i++) {
 
 			try {
 				writer = new FileWriter(file, true);
@@ -386,7 +388,7 @@ public class ParameterTuning {
 				writer.write(cost + "," + weightedFMeasure + "\n");
 				writer.close();
 
-				cost = cost + 0.1;
+				cost = cost + 0.01;
 				svm.setCost(cost);
 
 			} catch (Exception e) {
@@ -399,8 +401,10 @@ public class ParameterTuning {
 	public static void gamma_adv() {
 
 		File file = null;
-		double gamma = 0.0261;
+		double gamma = 0.00421;
 		double weightedFMeasure = -1.0;
+
+		Preprocess.standardize(DataHolder.getDatosTrain(), DataHolder.getDatosTest());
 
 		DataHolder.getDatosTrain().setClassIndex(DataHolder.getClassIndex(DataHolder.getDatosTrain()));
 		Instances trainSet = DataHolder.getDatosTrain();
@@ -410,7 +414,7 @@ public class ParameterTuning {
 		System.out.println("** TUNING GAMMA **");
 		System.out.println("Gamma,weightedFMeasure\n");
 		svm = new LibSVM();
-		svm.setCost(8.1);
+		svm.setCost(3.2);
 
 		try {
 			file = new File("BarridoParametros\\svm_gamma_adv.csv");
@@ -437,7 +441,7 @@ public class ParameterTuning {
 				writer.write(gamma + "," + weightedFMeasure + "\n");
 				writer.close();
 
-				gamma = gamma + 0.0001;
+				gamma = gamma + 0.00001;
 				svm.setGamma(gamma);
 
 			} catch (Exception e) {
@@ -510,9 +514,9 @@ public class ParameterTuning {
 
 		svm = new LibSVM();
 		svm.setSVMType(new SelectedTag(LibSVM.SVMTYPE_C_SVC, LibSVM.TAGS_SVMTYPE));
-		svm.setCost(8.2);
+		svm.setCost(3.2);
 		svm.setEps(0.4);
-		svm.setGamma(0.0264);
+		svm.setGamma(0.0042);
 		svm.setKernelType(new SelectedTag(LibSVM.KERNELTYPE_RBF, LibSVM.TAGS_KERNELTYPE));
 
 		try {
@@ -524,7 +528,7 @@ public class ParameterTuning {
 		} // Modelo resultante en fichero binario
 	}
 
-	//Inviable --> 48h de ejecución aproximadamente
+	// Inviable --> 48h de ejecución aproximadamente
 	public static void RBFGridSearch() {
 
 		File file = null;
@@ -578,7 +582,7 @@ public class ParameterTuning {
 					System.out.println(cost + "," + gamma + "," + weightedFMeasure + "\n");
 					writer.write(cost + "," + gamma + "," + weightedFMeasure + "\n");
 					writer.close();
-					
+
 					gammaExp = gammaExp + 0.1;
 					gamma = Math.pow(gammaBase, gammaExp);
 					svm.setGamma(gamma);
@@ -591,7 +595,7 @@ public class ParameterTuning {
 			costExp = costExp + 0.1;
 			cost = Math.pow(costBase, costExp);
 			svm.setCost(cost);
-			
+
 			gammaBase = 2;
 			gammaExp = -15; // Range [-15,3]
 			gamma = Math.pow(gammaBase, gammaExp);
@@ -605,10 +609,9 @@ public class ParameterTuning {
 		// Cargar datos
 		DataHolder.loadTrainData(args[0]);
 		DataHolder.loadTestData(args[1]);
-		// System.out.println("Datos cargados");
-		// System.out.println("Generando modelo binario...");
-		// saveBinaryModel();
-		RBFGridSearch();
+		System.out.println("Datos cargados");
+		System.out.println("Generando modelo binario...");
+		saveBinaryModel();
 
 	}
 
