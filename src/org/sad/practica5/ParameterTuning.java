@@ -453,10 +453,12 @@ public class ParameterTuning {
 	public static void eps_adv() {
 
 		File file = null;
-		double cost = 8.2;
-		double gamma = 0.0264;
-		double eps = 0.001;
+		double cost = 3.2;
+		double gamma = 0.0042;
+		double eps = 0.000;
 		double weightedFMeasure = -1.0;
+		
+		Preprocess.standardize(DataHolder.getDatosTrain(), DataHolder.getDatosTest());
 
 		DataHolder.getDatosTrain().setClassIndex(DataHolder.getClassIndex(DataHolder.getDatosTrain()));
 		Instances trainSet = DataHolder.getDatosTrain();
@@ -482,7 +484,7 @@ public class ParameterTuning {
 			e1.printStackTrace();
 		}
 
-		for (int i = 0; i < 9; i++) {
+		for (int i = 0; i < 120; i++) {
 
 			try {
 				writer = new FileWriter(file, true);
@@ -515,7 +517,7 @@ public class ParameterTuning {
 		svm = new LibSVM();
 		svm.setSVMType(new SelectedTag(LibSVM.SVMTYPE_C_SVC, LibSVM.TAGS_SVMTYPE));
 		svm.setCost(3.2);
-		svm.setEps(0.4);
+		svm.setEps(0.025);
 		svm.setGamma(0.0042);
 		svm.setKernelType(new SelectedTag(LibSVM.KERNELTYPE_RBF, LibSVM.TAGS_KERNELTYPE));
 
@@ -545,6 +547,8 @@ public class ParameterTuning {
 		double gammaExp = -15; // Range [-15,3]
 		gamma = Math.pow(gammaBase, gammaExp);
 
+		Preprocess.standardize(DataHolder.getDatosTrain(), DataHolder.getDatosTest());
+		
 		DataHolder.getDatosTrain().setClassIndex(DataHolder.getClassIndex(DataHolder.getDatosTrain()));
 		Instances trainSet = DataHolder.getDatosTrain();
 		DataHolder.getDatosTest().setClassIndex(DataHolder.getClassIndex(DataHolder.getDatosTest()));
@@ -612,6 +616,7 @@ public class ParameterTuning {
 		System.out.println("Datos cargados");
 		System.out.println("Generando modelo binario...");
 		saveBinaryModel();
+		
 
 	}
 

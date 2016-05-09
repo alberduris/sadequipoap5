@@ -72,7 +72,7 @@ public class InferedModelMain {
 			File file = new File("Resultados\\Infered_Model_Results.csv");
 			file.getParentFile().mkdir();
 			file.createNewFile();
-			writer = new FileWriter(file);
+			writer = new FileWriter(file,true);
 			
 			writer.write(pTitle+"\n");			
 			System.out.println(pEval.toClassDetailsString());
@@ -94,8 +94,6 @@ public class InferedModelMain {
 		DataHolder.loadTrainData(args[0]);
 		DataHolder.loadTestData(args[1]);
 		System.out.println("Datos cargados");
-
-		svmTunedHoldOut();
 		
 		System.out.println("Preprocesando datos...");
 		//Preprocesado
@@ -103,7 +101,7 @@ public class InferedModelMain {
 		System.out.println("Datos preprocesados");
 		
 		//HoldOut
-//		Evaluate.evaluarNaiveHoldOut();
+		Evaluate.evaluarkNNHoldOut();
 		svmTunedHoldOut();
 
 	}
