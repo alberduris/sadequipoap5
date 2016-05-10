@@ -520,6 +520,7 @@ public class ParameterTuning {
 		svm.setEps(0.025);
 		svm.setGamma(0.0042);
 		svm.setKernelType(new SelectedTag(LibSVM.KERNELTYPE_RBF, LibSVM.TAGS_KERNELTYPE));
+		svm.setDebug(false);
 
 		try {
 			SerializationHelper.write("modeloBinarioSVM", svm);
@@ -559,6 +560,7 @@ public class ParameterTuning {
 		svm.setCost(cost);
 		svm.setGamma(gamma);
 		svm.setKernelType(new SelectedTag(LibSVM.KERNELTYPE_RBF, LibSVM.TAGS_KERNELTYPE));
+		svm.setDebug(false);
 
 		try {
 			file = new File("BarridoParametros\\RBF_GridSearch.csv");
