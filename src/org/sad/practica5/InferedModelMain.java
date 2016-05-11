@@ -39,7 +39,12 @@ public class InferedModelMain {
 			System.out.println("** SVM - TUNED - HOLD OUT**");
 
 			svm = new LibSVM();
-			svm = (LibSVM) SerializationHelper.read("modeloBinarioSVM");
+			svm.setSVMType(new SelectedTag(LibSVM.SVMTYPE_C_SVC, LibSVM.TAGS_SVMTYPE));
+			svm.setCost(3.2);
+			svm.setEps(0.025);
+			svm.setGamma(0.0042);
+			svm.setKernelType(new SelectedTag(LibSVM.KERNELTYPE_RBF, LibSVM.TAGS_KERNELTYPE));
+			svm.setDebug(false);
 
 			svm.buildClassifier(trainSet);
 
