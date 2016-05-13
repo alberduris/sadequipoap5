@@ -345,7 +345,13 @@ public class ParameterTuning {
 		}
 
 	}
-
+	
+	
+	/*
+	 * brief Realiza un barrido avanzado sobre el parámetro cost
+	 * 
+	 * return void Imprime resultados en fichero
+	 */
 	public static void cost_adv() {
 
 		File file = null;
@@ -398,6 +404,11 @@ public class ParameterTuning {
 
 	}
 
+	/*
+	 * brief Realiza un barrido avanzado sobre el parámetro gamma
+	 * 
+	 * return void Imprime resultados en fichero
+	 */
 	public static void gamma_adv() {
 
 		File file = null;
@@ -450,6 +461,11 @@ public class ParameterTuning {
 		}
 	}
 
+	/*
+	 * brief Realiza un barrido avanzado sobre el parámetro eps
+	 * 
+	 * return void Imprime resultados en fichero
+	 */
 	public static void eps_adv() {
 
 		File file = null;
@@ -531,7 +547,14 @@ public class ParameterTuning {
 		} // Modelo resultante en fichero binario
 	}
 
-	// Inviable --> 48h de ejecución aproximadamente
+	/*
+	 * brief Realiza un barrido del tipo 'GridSearch' sobre los parámetros 
+	 * que aparecen en la expresión del tipo de Kernel --> RadialBasisFunction
+	 * 
+	 * note Inviable --> 48h de ejecución aproximadamente
+	 * 
+	 * return void Imprime resultados en fichero
+	 */
 	public static void RBFGridSearch() {
 
 		File file = null;
@@ -609,6 +632,7 @@ public class ParameterTuning {
 		}
 
 	}
+
 
 	public static void main(String[] args) {
 		System.out.println("Cargando datos...");

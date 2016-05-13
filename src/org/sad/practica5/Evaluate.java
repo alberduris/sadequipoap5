@@ -17,7 +17,7 @@ public class Evaluate {
 	
 
 	/*
-	 * brief Realiza evaluación mediante HoldOut aplicando NaiveBayes 
+	 * brief Realiza evaluación mediante HoldOut aplicando kNN 
 	 * 
 	 * note Se aplica con las configuraciones del clasificador standar
 	 *  
